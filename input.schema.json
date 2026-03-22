@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Banner Input",
+  "description": "Content configuration for the banner generator",
+  "type": "object",
+  "required": ["title", "subtitle", "icon_prompt"],
+  "additionalProperties": false,
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Main title displayed on the banner",
+      "minLength": 1,
+      "maxLength": 80,
+      "examples": ["Créez, apprenez, transmettez"]
+    },
+    "subtitle": {
+      "type": "string",
+      "description": "Subtitle text displayed inside the badge",
+      "minLength": 1,
+      "maxLength": 120,
+      "examples": ["La plateforme pour construire, enrichir et partager votre savoir"]
+    },
+    "icon_prompt": {
+      "type": "string",
+      "description": "Description of the icon to generate via Pollinations/flux. The script automatically appends the background color and color palette. Describe shape and style only.",
+      "minLength": 10,
+      "maxLength": 400,
+      "examples": [
+        "A single padlock icon, flat modern illustration style, clean minimalistic, no shadows, no text, no other elements, centered square composition",
+        "A single bar chart with an upward trend arrow, flat modern illustration style, vibrant multi-color bars, clean minimalistic, no shadows, no text, centered square composition"
+      ]
+    }
+  }
+}

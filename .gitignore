@@ -1,0 +1,22 @@
+# API key — never commit
+.env
+
+# Generated outputs
+output.webp
+output.jpg
+output.png
+icon_*.png
+
+# Background image (user-provided)
+background.png
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# OS
+.DS_Store
+Thumbs.db
