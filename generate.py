@@ -102,12 +102,19 @@ def load_conf(path: str = PARAMS_PATH) -> dict:
 
 def load_prompt(path: str = PROMPT_PATH) -> dict:
     """Load input.json → title, subtitle, icon_prompt."""
-    import json
+    import json, os
     defaults = {
         "title":       "My Banner",
         "subtitle":    "My subtitle",
         "icon_prompt": "A single padlock icon, flat modern illustration style, clean minimalistic, no shadows, no text, centered square composition",
     }
+    if not os.path.exists(path):
+        example = path.replace(".json", ".example.json")
+        if os.path.exists(example):
+            print(f"WARNING: {path} not found. Copy {example} to {path} and fill in your content.")
+        else:
+            print(f"WARNING: {path} not found. Create it based on input.example.json.")
+        exit(1)
     with open(path, "r", encoding="utf-8") as f:
         data = json.load(f)
     defaults.update({k: v for k, v in data.items() if k in defaults})
