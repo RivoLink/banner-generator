@@ -187,14 +187,25 @@ def remove_background_flood(img: Image.Image, tolerance: int = 40) -> Image.Imag
     w, h = img.size
     pixels = img.load()
 
-    seeds = [(0,0),(w-1,0),(0,h-1),(w-1,h-1)]
-    corner_colors = [pixels[sx,sy][:3] for sx,sy in seeds]
+    # seed from ALL border pixels (not just corners) for better coverage
+    seeds = (
+        [(x, 0) for x in range(w)] +
+        [(x, h-1) for x in range(w)] +
+        [(0, y) for y in range(h)] +
+        [(w-1, y) for y in range(h)]
+    )
+
+    # detect bg color from corners
+    corner_colors = [pixels[sx,sy][:3] for sx,sy in [(0,0),(w-1,0),(0,h-1),(w-1,h-1)]]
     bg = tuple(sum(c[i] for c in corner_colors)//4 for i in range(3))
     print(f"Detected background: rgb{bg}")
 
     visited = set()
-    queue = deque(seeds)
-    visited.update(seeds)
+    queue = deque()
+    for s in seeds:
+        if s not in visited:
+            visited.add(s)
+            queue.append(s)
 
     def dist(c1, c2): return max(abs(c1[i]-c2[i]) for i in range(3))
 
@@ -210,14 +221,33 @@ def remove_background_flood(img: Image.Image, tolerance: int = 40) -> Image.Imag
 
     print("Flood fill done")
 
+    # second pass: remove any remaining isolated bg-color pixels inside the icon
+    # (enclosed areas not reachable from border, e.g. between chart bars)
+    r_ch, g_ch, b_ch, a_ch = img.split()
+    rd = list(r_ch.tobytes())
+    gd = list(g_ch.tobytes())
+    bd = list(b_ch.tobytes())
+    ad = list(a_ch.tobytes())
+    new_a = []
+    for i in range(len(rd)):
+        if ad[i] > 0:  # only process still-visible pixels
+            pixel_color = (rd[i], gd[i], bd[i])
+            if dist(pixel_color, bg) <= tolerance:
+                new_a.append(0)   # remove isolated bg pixel
+            else:
+                new_a.append(ad[i])
+        else:
+            new_a.append(0)
+    a_ch = Image.frombytes('L', img.size, bytes(new_a))
+    print("Inner background pixels removed")
+
     # smooth edges — blur alpha only on edge pixels
-    r, g, b, a = img.split()
-    a_blur = a.filter(ImageFilter.GaussianBlur(radius=1.2))
-    ad  = list(a.tobytes())
-    abd = list(a_blur.tobytes())
-    a = Image.frombytes('L', a.size, bytes([abd[i] if 0 < ad[i] < 255 else ad[i] for i in range(len(ad))]))
+    a_blur = a_ch.filter(ImageFilter.GaussianBlur(radius=1.2))
+    ad2  = list(a_ch.tobytes())
+    abd  = list(a_blur.tobytes())
+    a_ch = Image.frombytes('L', a_ch.size, bytes([abd[i] if 0 < ad2[i] < 255 else ad2[i] for i in range(len(ad2))]))
     print("Edge anti-aliasing applied")
-    return Image.merge('RGBA', (r, g, b, a))
+    return Image.merge('RGBA', (r_ch, g_ch, b_ch, a_ch))
 
 
 # ── STEP 4: Draw smooth anti-aliased badge ───────────────────────────────
