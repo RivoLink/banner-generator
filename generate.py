@@ -43,7 +43,7 @@ DEFAULTS = {
 
 FONT_BOLD  = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
 PARAMS_PATH = "params.conf"
-PROMPT_PATH = "input.json"
+INPUT_PATH = "input.json"
 
 
 # ── PARSERS ───────────────────────────────────────────────────────────────
@@ -100,7 +100,7 @@ def load_conf(path: str = PARAMS_PATH) -> dict:
     return params
 
 
-def load_prompt(path: str = PROMPT_PATH) -> dict:
+def load_prompt(path: str = INPUT_PATH) -> dict:
     """Load input.json → title, subtitle, icon_prompt."""
     import json, os
     defaults = {
@@ -332,24 +332,33 @@ def compose(icon: Image.Image, prompt: dict, params: dict) -> None:
 
 # ── MAIN ──────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
-    import sys
+    import sys, os
 
-    # parse --icon=<path> argument
+    # parse arguments
     custom_icon_path = None
+    custom_input_path = INPUT_PATH
+    custom_output_path = None
     for arg in sys.argv[1:]:
         if arg.startswith("--icon="):
             custom_icon_path = arg.split("=", 1)[1]
-            break
+        elif arg.startswith("--input="):
+            custom_input_path = arg.split("=", 1)[1]
+            if not os.path.exists(custom_input_path):
+                print(f"ERROR: Input file not found: '{custom_input_path}'")
+                exit(1)
+        elif arg.startswith("--output="):
+            custom_output_path = arg.split("=", 1)[1]
 
     params = load_conf(PARAMS_PATH)
-    prompt = load_prompt(PROMPT_PATH)
+    if custom_output_path:
+        params["output"] = custom_output_path
+    prompt = load_prompt(custom_input_path)
 
     print(f"Title   : {prompt['title']}")
     print(f"Subtitle: {prompt['subtitle']}")
     print()
 
     # check background exists before doing anything
-    import os
     if not os.path.exists(params["background"]):
         print(f"\nWARNING: Background image not found: '{params['background']}'")
         print(f"   Add your background image or update 'background' in params.conf\n")
