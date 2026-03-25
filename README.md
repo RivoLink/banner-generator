@@ -78,9 +78,9 @@ python generate.py
 
 ```ini
 # Layout (fraction of image height 0.0–1.0)
-icon_y    = 0.26
-title_y   = 0.52
-badge_y   = 0.64
+icon_y    = 0.28
+title_y   = 0.50
+badge_y   = 0.62
 
 # Icon
 icon_size     = 320       # final icon size in px
