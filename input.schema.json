@@ -10,14 +10,14 @@
       "type": "string",
       "description": "Main title displayed on the banner",
       "minLength": 1,
-      "maxLength": 80,
+      "maxLength": 30,
       "examples": ["Créez, apprenez, transmettez"]
     },
     "subtitle": {
       "type": "string",
       "description": "Subtitle text displayed inside the badge",
       "minLength": 1,
-      "maxLength": 120,
+      "maxLength": 80,
       "examples": ["La plateforme pour construire, enrichir et partager votre savoir"]
     },
     "icon_prompt": {
