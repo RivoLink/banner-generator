@@ -1,10 +1,17 @@
 # API key — never commit
 .env
 
+# Backups
+/backups
+
+# Inputs
+input-*.json
+
 # Generated outputs
 output.webp
 output.jpg
 output.png
+output-*.*
 icon_*.png
 
 # Background image (user-provided)
